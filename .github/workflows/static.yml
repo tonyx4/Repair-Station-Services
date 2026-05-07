@@ -24,7 +24,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Esto le dice a GitHub que use la carpeta frontend
-          path: './frontend'
+          # Quitamos el ./ y dejamos solo el nombre de la carpeta
+          path: 'frontend'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
