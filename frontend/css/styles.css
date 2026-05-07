@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <!-- Configuración técnica del documento y codificación de caracteres -->
-    <meta charset="UTF-8">
-    <title>Repair Station Services - Access Control</title>
-    
-    <style>
+
         /* CSS: DEFINICIÓN DE LA IDENTIDAD VISUAL INSTITUCIONAL */
         
         /* Configuración global: Centra el formato en pantalla y define el fondo gris técnico */
@@ -103,46 +96,4 @@
             text-align: right;
             text-transform: uppercase;
         }
-    </style>
-</head>
-<body>
-
-    <!-- ESTRUCTURA FUNCIONAL DEL FORMULARIO -->
-    <div class="form-container">
-        
-        <!-- Sección de Identificación de la Empresa -->
-        <div class="header-station">
-            <div class="logo-placeholder">🛠 REPAIR STATION</div>
-            <p class="department-label">SERVICES & MAINTENANCE DIVISION</p>
-        </div>
-
-        <!-- Título del Documento/Servicio -->
-        <h3 style="text-align: center; text-transform: uppercase; color: #2c3e50; margin-bottom: 30px;">
-            Control de Acceso de Personal
-        </h3>
-        
-        <!-- Formulario de Envío: Conecta con el Endpoint POST /login definido en app.js -->
-        <form action="/login" method="POST">
-            
-            <!-- Campo de Usuario: Identificador único del técnico/empleado -->
-            <div class="form-group">
-                <label>ID de Empleado / Técnico:</label>
-                <input type="text" name="username" placeholder="Ingrese su ID" required>
-            </div>
-            
-            <!-- Campo de Contraseña: Clave de seguridad enmascarada -->
-            <div class="form-group">
-                <label>Pin de Seguridad / Password:</label>
-                <input type="password" name="password" placeholder="••••••••" required>
-            </div>
-            
-            <!-- Disparador de la Petición: Envía los datos al Backend para su procesamiento -->
-            <button type="submit">Ejecutar Validación</button>
-        </form>
-
-        <!-- Referencia Técnica del Formato -->
-        <div class="footer-ref">FORM-RS-001 / REV. 2026</div>
-    </div>
-
-</body>
-</html>
+    

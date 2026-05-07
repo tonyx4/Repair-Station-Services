@@ -5,13 +5,16 @@
 // Importamos Express: El framework principal para gestionar peticiones HTTP y rutas.
 const express = require("express");// El motor del servidor web.
 
+// Importamos módulo nativo de Node.js para manejo de rutas de archivos
+const path = require("path");
+
 // Importamos el módulo de conexión: Ejecuta la lógica para conectar a MongoDB.
 // Nota técnica: Se mantiene el nombre 'mongoose' para no alterar tus líneas posteriores.
-const conectarDB = require("./config"); // Nuestra funcion de coneccion
+const conectarDB = require("./config/config"); // Nuestra funcion de coneccion
 
 // Importamos el Modelo de Usuario: Define qué campos (username/password) se validarán en el sistema.
 // Nota: Asegúrate que el archivo se llame model.js o models.js según tu carpeta.
-const Usuario = require("./model"); // El esquema de datos para validar las credenciales de los tecnicos en la base de datos central de la division de mantenimiento.   
+const Usuario = require("./models/model"); // El esquema de datos para validar las credenciales de los tecnicos en la base de datos central de la division de mantenimiento.   
 
 // =============================================================================
 // 2. CONFIGURACIÓN DEL SERVIDOR WEB  iniicializando Express y Middleware
@@ -29,15 +32,21 @@ app.use(express.json());
 // Middleware URL-Encoded: Procesa los datos que vienen directamente de los formularios HTML del Repair Station.
 app.use(express.urlencoded({ extended: true })); //// Permite entender datos de formularios HTML.
 
+// Middleware para servir archivos estáticos del frontend (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, "../frontend")));
+
 // =============================================================================
 // 3. DEFINICIÓN DE RUTAS (ENDPOINTS) - LÓGICA DE NEGOCIO 
 // =============================================================================
 
 // RUTA PRINCIPAL (GET /): Entrega la interfaz visual del formato de control de acceso.
 // Procesa los datos enviados por el técnico.
+
+// NOTA: Se eliminó la redeclaración duplicada de 'path' para evitar errores en ejecución.
+
 app.get("/", (req, res) => {
     // __dirname localiza la carpeta actual para enviar el archivo index.html con el nuevo diseño institucional.
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
 // RUTA DE AUTENTICACIÓN (POST /login): Punto donde se validan las credenciales de los técnicos.
