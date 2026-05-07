@@ -1,8 +1,12 @@
 // Importamos la librería mongoose para interactuar con la base de datos NoSQL MongoDB.
 const mongoose = require('mongoose');
 
-// Definimos la URI de conexión. 'repairStationDB' es el nombre de la base de datos local.
-const dbURI = 'mongodb://127.0.0.1:27017/repairStationDB';
+// =============================================================================
+// CONFIGURACIÓN DUAL DE CONEXIÓN
+// =============================================================================
+// Si existe la variable MONGO_URI (en la nube), la usa. 
+// Si no existe, usa tu dirección local de siempre (127.0.0.1).
+const dbURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/repairStationDB';
 
 /**
  * Función asíncrona para establecer la conexión con el servidor de base de datos.
@@ -10,10 +14,13 @@ const dbURI = 'mongodb://127.0.0.1:27017/repairStationDB';
  */
 const conectarDB = async () => {
     try {
-        // Intentamos realizar la conexión con los parámetros de la URI.
+        // Intentamos realizar la conexión con la URI detectada (Nube o Local).
         await mongoose.connect(dbURI);
-        // Si tiene éxito, imprimimos la confirmación en la consola del servidor.
-        console.log('✅ Conexión a MongoDB exitosa - Repair Station Online');
+        
+        // Mensaje dinámico para saber dónde nos conectamos
+        const tipoConexion = process.env.MONGO_URI ? 'NUBE' : 'LOCAL (XAMPP/Mongo)';
+        console.log(`✅ Conexión exitosa [Modo: ${tipoConexion}] - Repair Station Online`);
+        
     } catch (err) {
         // En caso de fallo, capturamos el error y detenemos la ejecución del proceso.
         console.error('❌ Error al conectar a MongoDB:', err);

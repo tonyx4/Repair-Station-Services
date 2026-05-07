@@ -8,6 +8,9 @@ const express = require("express");// El motor del servidor web.
 // Importamos módulo nativo de Node.js para manejo de rutas de archivos
 const path = require("path");
 
+// ADICIÓN PARA LA NUBE: Importamos CORS para permitir conexión desde GitHub Pages
+const cors = require("cors");
+
 // Importamos el módulo de conexión: Ejecuta la lógica para conectar a MongoDB.
 // Nota técnica: Se mantiene el nombre 'mongoose' para no alterar tus líneas posteriores.
 const conectarDB = require("./config/config"); // Nuestra funcion de coneccion
@@ -21,7 +24,12 @@ const Usuario = require("./models/model"); // El esquema de datos para validar l
 // =============================================================================
 
 const app = express(); // Creamos una instancia de Express para configurar nuestro servidor web.
-const port = 3005; // Definimos el puerto de escucha para la comunicación del servicio.
+
+// ADICIÓN PARA LA NUBE: Activamos CORS para recibir datos desde el formulario en la web.
+app.use(cors());
+
+// MODIFICACIÓN DUAL: Mantenemos tu puerto 3005 pero anexamos el puerto dinámico de la nube.
+const port = process.env.PORT || 3005; 
 
 // Ejecutamos la conexión a la base de datos antes de procesar cualquier ruta.
 conectarDB();
@@ -93,7 +101,7 @@ app.post("/login", async (req, res) => {
 // 4. ARRANQUE DEL SERVICIO (LISTENER)
 // =============================================================================
 
-// Iniciamos el servidor para que quede a la espera de solicitudes en el puerto configurado.
+// Iniciamos el servidor preparado para detectar si está en LOCAL o en la NUBE.
 app.listen(port, () => {
-    console.log(`Servidor de Repair Station operando en: http://localhost:${port}`);
+    console.log(`Servidor de Repair Station operando en puerto: ${port}`);
 });
