@@ -3,42 +3,36 @@
   "version": "1.0.0",
   "description": "Sistema de gestión para estación de reparación de aeronaves",
   "main": "backend/app.js",
-
   "_nota_scripts": "Define los comandos que puedes ejecutar en la terminal (ej: npm run dev)",
   "scripts": {
     "start": "node backend/app.js",
     "dev": "nodemon backend/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-
   "_nota_dependencies": "Librerías externas necesarias para que el proyecto funcione",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongoose": "^9.6.1",
     "mysql2": "^3.22.3",
     "nodemon": "^3.1.14"
   },
-
   "_nota_repository": "Vinculación con el control de versiones en GitHub",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tonyx4/Repair-Station-Services.git"
   },
-
   "keywords": [
     "repair",
     "station",
     "aircraft",
     "backend"
   ],
-  
   "author": "Tonyx4",
   "license": "ISC",
-
   "_nota_bugs": "Enlace para reportar errores en el repositorio",
   "bugs": {
     "url": "https://github.com/tonyx4/Repair-Station-Services/issues"
   },
-
   "homepage": "https://github.com/tonyx4/Repair-Station-Services#readme"
 }
