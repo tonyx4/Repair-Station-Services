@@ -9,12 +9,11 @@ const mysql = require('mysql2/promise');
 const mongoose = require('mongoose');
 
 // Importamos los "moldes" que creamos anteriormente para organizar la información.
-const Usuario = require('./model');     // El modelo de técnicos/usuarios.
-const Aircraft = require('./Aircraft'); // El modelo de los aviones.
-const Components = require('./Components'); // CORRECCIÓN: Nombre cambiado a Components para coincidir con la ejecución.
-const WorkOrder = require('./WorkOrder'); // El modelo de órdenes de trabajo.
-const WorkOrderTask = require('./WorkOrderTask'); // El modelo de tareas.
-
+const Usuario = require('../models/model');     // El modelo de técnicos/usuarios.
+const Aircraft = require('../models/Aircraft'); // El modelo de los aviones.
+const Components = require('../models/Components'); // CORRECCIÓN: Nombre cambiado a Components para coincidir con la ejecución.
+const WorkOrder = require('../models/WorkOrder'); // El modelo de órdenes de trabajo.
+const WorkOrderTask = require('../models/WorkOrderTask'); // El modelo de tareas.
 // =============================================================================
 // 2. FUNCIÓN PRINCIPAL DE MIGRACIÓN
 // =============================================================================
