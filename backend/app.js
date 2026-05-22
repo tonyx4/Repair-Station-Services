@@ -19,14 +19,26 @@ const conectarDB = require("./config/config"); // Nuestra funcion de coneccion
 // Nota: Asegúrate que el archivo se llame model.js o models.js según tu carpeta.
 const Usuario = require("./models/model"); // El esquema de datos para validar las credenciales de los tecnicos en la base de datos central de la division de mantenimiento.   
 
+// Importamos Mongoose directamente para acceder al motor de conexión activo de MongoDB.
+// FINALIDAD:
+// Permite consultar estadísticas avanzadas de la base de datos,
+// acceder dinámicamente a colecciones,
+// contar documentos,
+// y construir paneles de monitoreo del sistema MRO.
+const mongoose = require("mongoose");
+
 // =============================================================================
 // 2. CONFIGURACIÓN DEL SERVIDOR WEB  iniicializando Express y Middleware
 // =============================================================================
 
 const app = express(); // Creamos una instancia de Express para configurar nuestro servidor web.
 
-// ADICIÓN PARA LA NUBE: Activamos CORS para recibir datos desde el formulario en la web.
-app.use(cors());
+// ADICIÓN PARA LA NUBE Y LOCAL: Activamos CORS permitiendo explícitamente tu puerto de Live Server
+app.use(cors({
+    origin: ["http://127.0.0.1:5500", "http://127.0.0.1:5501", "http://localhost:5500", "http://localhost:5501"],
+    methods: ["GET", "POST"],
+    credentials: true
+}));
 
 // MODIFICACIÓN DUAL: Mantenemos tu puerto 3005 pero anexamos el puerto dinámico de la nube.
 const port = process.env.PORT || 3005; 
@@ -94,6 +106,145 @@ app.post("/login", async (req, res) => {
         // MANEJO DE EXCEPCIONES: Captura fallos técnicos inesperados o errores de conexión con la DB.
         console.error("Falla crítica en la consulta:", error);
         res.status(500).send("Error interno del servidor de la Estación de Reparación");
+    }
+});
+
+// NUEVO ENDPOINT SEGURO: Verifica de forma efectiva la comunicación con la base de datos y responde al formulario sin recargar la página.
+app.post("/api/verificar-comunicacion", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Consulta de prueba a MongoDB para validar el estado de la comunicación en tiempo real
+        const usuarioEncontrado = await Usuario.findOne({ username, password });
+
+        if (usuarioEncontrado) {
+            res.status(200).json({
+                status: "success",
+                efectiva: true,
+                message: `Comunicación efectiva con el sistema. Técnico ${username} validado.`
+            });
+        } else {
+            res.status(200).json({
+                status: "warning",
+                efectiva: true, // La comunicación SÍ funcionó (Mongo respondió), pero los datos no coinciden
+                message: "Comunicación establecida con éxito, pero las credenciales no son válidas en el sistema."
+            });
+        }
+    } catch (error) {
+        // Si entra aquí, la base de datos MongoDB está apagada o inaccesible
+        console.error("Fallo de comunicación interna con MongoDB:", error);
+        res.status(500).json({
+            status: "error",
+            efectiva: false,
+            message: "Fallo en la comunicación con el sistema: La base de datos no responde."
+        });
+    }
+});
+
+// =============================================================================
+// ENDPOINT DE MONITOREO DEL SISTEMA MRO Y ESTADÍSTICAS DE MONGODB
+// =============================================================================
+// FINALIDAD:
+// Este endpoint permite consultar información operacional de MongoDB
+// desde el frontend del sistema Repair Station.
+//
+// FUNCIONES PRINCIPALES:
+// - Detectar colecciones activas
+// - Contar documentos por colección
+// - Mostrar estadísticas operacionales
+// - Preparar dashboards dinámicos
+// - Supervisar el estado del sistema MRO
+app.get("/api/system-stats", async (req, res) => {
+    try {
+
+        // Accedemos directamente a la conexión activa de MongoDB
+        const db = mongoose.connection.db;
+
+        // Obtenemos todas las colecciones existentes dentro de repairStationDB
+        const collections = await db.listCollections().toArray();
+
+        // Creamos un arreglo vacío donde almacenaremos las estadísticas
+        const estadisticas = [];
+
+        // Recorremos cada colección encontrada en MongoDB
+        for (const collection of collections) {
+
+            // Accedemos a la colección actual
+            const collectionName = collection.name;
+
+            // Contamos cuántos documentos existen en la colección
+            const totalDocuments = await db.collection(collectionName).countDocuments();
+
+            // Guardamos la información de la colección
+            estadisticas.push({
+                collection: collectionName,
+                documents: totalDocuments
+            });
+        }
+
+        // Enviamos respuesta JSON al frontend
+        res.status(200).json({
+            status: "success",
+            database: "repairStationDB",
+            totalCollections: collections.length,
+            collections: estadisticas
+        });
+
+    } catch (error) {
+
+        // Captura de errores de MongoDB o conexión
+        console.error("Error consultando estadísticas MongoDB:", error);
+
+        res.status(500).json({
+            status: "error",
+            message: "No fue posible obtener estadísticas del sistema."
+        });
+    }
+});
+
+// =============================================================================
+// ENDPOINT DINÁMICO DE CONSULTA DE COLECCIONES MRO
+// =============================================================================
+// FINALIDAD:
+// Permite consultar cualquier colección de MongoDB
+// directamente desde el frontend.
+//
+// EJEMPLOS:
+// /api/collection/components
+// /api/collection/aircrafts
+// /api/collection/users
+app.get("/api/collection/:nombreColeccion", async (req, res) => {
+
+    try {
+
+        // Capturamos el nombre enviado desde la URL
+        const nombreColeccion = req.params.nombreColeccion;
+
+        // Accedemos a la conexión MongoDB activa
+        const db = mongoose.connection.db;
+
+        // Consultamos todos los documentos de la colección
+        const documentos = await db
+            .collection(nombreColeccion)
+            .find({})
+            .toArray();
+
+        // Enviamos respuesta JSON al frontend
+        res.status(200).json({
+            status: "success",
+            collection: nombreColeccion,
+            total: documentos.length,
+            data: documentos
+        });
+
+    } catch (error) {
+
+        console.error("Error consultando colección:", error);
+
+        res.status(500).json({
+            status: "error",
+            message: "No fue posible consultar la colección."
+        });
     }
 });
 
